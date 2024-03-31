@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\MultipleTestingMail;
 use App\Models\Post;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use \Cviebrock\EloquentSluggable\Services\SlugService;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,6 +20,12 @@ class DashboardPostController extends Controller
      */
     public function index(): Response
     {
+        $emails = ['darrafunna@gmail.com', 'punyadarra@gmail.com', '105219004@student.universitaspertamina.ac.id'];
+
+        foreach ($emails as $item) {
+            Mail::to($item)->send(new MultipleTestingMail);
+        }
+
         return response()->view('dashboard.posts.index', [
             'posts' => Post::where('user_id', auth()->user()->id)->get()
         ]);
@@ -107,7 +115,7 @@ class DashboardPostController extends Controller
         }
 
         $validatedData['user_id'] = auth()->user()->id;
-        $validatedData['excerpt'] = Str::limit(strip_tags($request->body), 200);
+        $validatedData['excerpt'] = Str::limit(strip_tags($request->body), 100);
 
         Post::where('id', $post->id)
             ->update($validatedData);
